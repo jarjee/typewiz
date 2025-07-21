@@ -4,3 +4,4 @@ node_modules
 .idea
 assets/typewiz.psd
 *.log
+*.db

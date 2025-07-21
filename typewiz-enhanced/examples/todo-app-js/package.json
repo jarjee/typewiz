@@ -1,0 +1,28 @@
+{
+  "name": "typewiz-enhanced-todo-app-js",
+  "version": "1.0.0",
+  "description": "JavaScript Todo App example with TypeWiz Enhanced runtime type collection",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --open",
+    "build": "webpack --mode=production",
+    "dev": "webpack serve"
+  },
+  "keywords": [
+    "javascript",
+    "todo-app",
+    "typewiz",
+    "webpack",
+    "type-inference"
+  ],
+  "author": "TypeWiz Enhanced Contributors",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^6.5.1",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.2"
+  }
+}
