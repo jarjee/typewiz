@@ -1,55 +1,84 @@
 {
-  "private": true,
-  "scripts": {
-    "build-clean": "rimraf packages/*/dist",
-    "build": "lerna run build",
-    "format": "prettier --write packages/*/src/**.ts **/*.json",
-    "precommit": "lint-staged",
-    "prepublish": "yarn run build",
-    "lint": "lerna run lint",
-    "test": "jest",
-    "test:ci": "yarn run lint && jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "test:watch": "jest --watch"
-  },
-  "workspaces": [
-    "packages/*"
+  "name": "rspack-typewiz-plugin",
+  "version": "2.0.0",
+  "description": "Advanced runtime type collection & analysis system with SQLite storage and REST API for JavaScript code instrumentation",
+  "main": "index.js",
+  "private": false,
+  "files": [
+    "lib/",
+    "examples/",
+    "docs/",
+    "index.js",
+    "README.md",
+    "TYPESCRIPT.md",
+    "EXAMPLE.md",
+    "CHANGELOG.md"
   ],
+  "scripts": {
+    "test": "jest",
+    "example": "cd examples && rspack serve --open",
+    "build": "echo 'No build step required - JavaScript library'",
+    "api-server": "node examples/start-api-server.js",
+    "dev": "cd examples && concurrently \"rspack serve\" \"node start-api-server.js\"",
+    "demo": "npm run dev",
+    "lint": "eslint lib/ examples/ --fix",
+    "typecheck": "echo 'No TypeScript files to check'",
+    "package": "npm pack",
+    "prepublishOnly": "npm run lint"
+  },
+  "keywords": [
+    "typescript",
+    "javascript",
+    "type-inference",
+    "runtime-analysis",
+    "rspack",
+    "webpack",
+    "instrumentation",
+    "sqlite",
+    "api",
+    "jsdoc",
+    "code-analysis",
+    "llm",
+    "type-collection"
+  ],
+  "author": "TypeWiz Enhanced Contributors",
+  "license": "ISC",
+  "peerDependencies": {
+    "@rspack/core": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@rspack/core": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "@types/jest": "^23.3.9",
-    "copyfiles": "^1.2.0",
-    "coveralls": "^3.0.0",
-    "husky": "^1.2.0",
-    "jest": "^23.6.0",
-    "lerna": "^3.4.3",
-    "lint-staged": "^8.1.0",
-    "prettier": "^1.15.2",
-    "rimraf": "^2.6.2",
-    "ts-jest": "^23.10.5",
-    "ts-node": "^7.0.1",
-    "tslint": "^5.11.0",
-    "typescript": "^3.1.1"
+    "@babel/plugin-transform-modules-commonjs": "^7.16.8",
+    "@rspack/cli": "^1.0.0",
+    "@rspack/core": "^1.0.0",
+    "babel-eslint": "^10.1.0",
+    "concurrently": "^9.2.0",
+    "css-loader": "^6.5.1",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.25.4",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^27.5.1",
+    "jsdom": "^26.1.0",
+    "node-fetch": "^3.3.2",
+    "style-loader": "^3.3.1",
+    "supertest": "^7.1.3",
+    "typescript": "^5.8.3"
   },
-  "engines": {
-    "node": ">= 8.0.0",
-    "yarn": ">= 1.5.1"
-  },
-  "jest": {
-    "projects": [
-      "<rootDir>/packages/*"
-    ]
-  },
-  "lint-staged": {
-    "*.{js,json}": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.ts": [
-      "prettier --write",
-      "tslint --fix",
-      "git add"
-    ]
-  },
-  "resolutions": {
-    "source-map": "0.6.1"
+  "dependencies": {
+    "@babel/generator": "^7.28.0",
+    "@babel/parser": "^7.28.0",
+    "@babel/traverse": "^7.28.0",
+    "@babel/types": "^7.28.1",
+    "better-sqlite3": "^12.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "lodash": "^4.17.21",
+    "micromatch": "^4.0.8",
+    "source-map": "^0.7.4"
   }
 }
