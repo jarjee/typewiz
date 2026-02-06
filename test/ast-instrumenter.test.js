@@ -255,6 +255,133 @@ function greet(name, greeting = 'Hello') {
         
     });
     
+    describe('Callback Argument Instrumentation (HOF)', () => {
+
+        test('should instrument arrow function passed as argument to a call', () => {
+            const source = `
+createRoutine('DASHBOARDS/READ', (payload) => ({ ...payload }));
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            expect(result).toContain('createRoutine_arg1_param_payload');
+            expect(result).toContain('context: "callback_argument_parameter"');
+            expect(result).toContain('calleeName: "createRoutine"');
+            expect(result).toContain('calleeArgIndex: 1');
+        });
+
+        test('should instrument function expression passed as argument', () => {
+            const source = `
+someLib.register(function handler(req, res) {
+    return res.send('ok');
+});
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            expect(result).toContain('someLib.register_arg0_param_req');
+            expect(result).toContain('someLib.register_arg0_param_res');
+            expect(result).toContain('context: "callback_argument_parameter"');
+        });
+
+        test('should instrument multiple callback arguments in a single call', () => {
+            const source = `
+promise.then(
+    (value) => console.log(value),
+    (error) => console.error(error)
+);
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            expect(result).toContain('promise.then_arg0_param_value');
+            expect(result).toContain('promise.then_arg1_param_error');
+        });
+
+        test('should instrument callback with destructured parameter', () => {
+            const source = `
+items.forEach(({ name, id }) => {
+    console.log(name, id);
+});
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            expect(result).toContain('items.forEach_arg0_param_destructured_object');
+            expect(result).toContain('isDestructured: true');
+        });
+
+        test('should instrument callback with concise arrow body', () => {
+            const source = `
+const result = items.map((x) => x * 2);
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            // The concise arrow body should be converted to a block with return
+            expect(result).toContain('items.map_arg0_param_x');
+        });
+
+        test('should handle connect() HOC pattern', () => {
+            const source = `
+connect(
+    (state) => ({ user: state.user }),
+    { fetchUser, updateUser }
+)(UserComponent);
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            expect(result).toContain('connect_arg0_param_state');
+            expect(result).toContain('calleeName: "connect"');
+            expect(result).toContain('calleeArgIndex: 0');
+        });
+
+        test('should handle createSelector pattern', () => {
+            const source = `
+const getVisibleTodos = createSelector(
+    (state) => state.todos,
+    (state) => state.filter,
+    (todos, filter) => todos.filter(t => t.status === filter)
+);
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            expect(result).toContain('createSelector_arg0_param_state');
+            expect(result).toContain('createSelector_arg1_param_state');
+            expect(result).toContain('createSelector_arg2_param_todos');
+            expect(result).toContain('createSelector_arg2_param_filter');
+        });
+
+        test('should not duplicate instrumentation for named arrow in VariableDeclarator', () => {
+            // When an arrow is directly assigned to a variable (not inside a call),
+            // only the VariableDeclarator visitor should handle it — not the CallExpression one.
+            const source = `
+const myFunc = (a) => a + 1;
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            // Should have the named instrumentation, not a callback_argument one
+            expect(result).toContain('myFunc_param_a');
+            expect(result).not.toContain('callback_argument_parameter');
+        });
+
+        test('should skip non-function arguments', () => {
+            const source = `
+createRoutine('DASHBOARDS/READ', null, { meta: true });
+`;
+            const result = instrumentCodeWithAST(source, 'test.js');
+
+            // No callback arguments to instrument
+            expect(result).not.toContain('callback_argument_parameter');
+        });
+
+        test('should handle TypeScript callback arguments', () => {
+            const source = `
+createRoutine<DashboardPayload>('DASHBOARDS/READ', (payload: DashboardPayload) => ({ ...payload }));
+`;
+            const result = instrumentCodeWithAST(source, 'test.ts');
+
+            expect(result).toContain('createRoutine_arg1_param_payload');
+            expect(result).toContain('parameterType: "annotated"');
+        });
+
+    });
+
     describe('TypeWiz Runtime Injection', () => {
         
         test('should inject TypeWiz runtime at the beginning', () => {
